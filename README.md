@@ -23,7 +23,7 @@ For a semi-practical example, see [the HTTP example](examples/http)
 Asink currently exposes:
 
 ### `Result<T, E>`
-Modeled after Rust.
+Modeled after Rust's [type of the same name](https://doc.rust-lang.org/stable/std/result/enum.Result.html).
 
 * `Result.new(success, value) => Result`
 * `Result.ok(value: T) => Result`
@@ -34,14 +34,13 @@ Modeled after Rust.
 * `Result:unwrapErrorOrDie() => T`
 * `Result:isOk() => bool`
 * `Result:isError() => bool`
-* `Result:await() => yields T`
 * `Result:map(f: T => U) => Result<U, E>`
 * `Result:mapError(f: E => F) => Result<T, F>`
 * `Result:andThen(f: T => Result<U, E>) => Result<U, E>`
 * `Result:orElse(f: E => Result<T, F>) => Result<T, F>`
 
 ### `Future<T>`
-Modeled after Rust.
+Loosely modeled after Rust's [type of the same name](https://doc.rust-lang.org/stable/std/future/trait.Future.html).
 
 * `Future.new() => Future, resolveFn`
 * `Future.resolved(value: T) => Future`
