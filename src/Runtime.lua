@@ -32,6 +32,9 @@ function Runtime.addFutureRejectionHandler(handler)
 	end
 end
 
+-- Alternative to `spawn` or `coroutine.wrap` that runs immediately, but
+-- propagates errors to the engine instead of swallowing them or killing the
+-- containing thread.
 function Runtime.exec(functor)
 	local bindable = Instance.new("BindableEvent")
 	bindable.Event:Connect(functor)
@@ -39,9 +42,12 @@ function Runtime.exec(functor)
 	bindable:Destroy()
 end
 
-function Runtime.__start(task)
-	trackedTasks[task] = true
-
+-- Start the Asink runtime if it isn't already running.
+--
+-- The runtime will monitor outstanding tasks that yielded at some point and
+-- watch them for errors. It isn't strictly necessary for the happy path, but is
+-- necessary to let Lua code know about fatal errors in Futures.
+function Runtime.__start()
 	if pollConnection ~= nil then
 		return
 	end
@@ -66,7 +72,6 @@ function Runtime.__start(task)
 					-- Someone else will have received an error.
 					local message = debug.traceback(task.co)
 					Runtime.__fireFutureRejection(message)
-					return
 				end
 			else
 				-- This task is still outstanding, carry it over.
@@ -96,8 +101,10 @@ function Runtime.__runFutureListener(listener, value)
 		return
 	end
 
-	if coroutine.status(co) == "suspended" then
-		Runtime.__start(task)
+	-- If the listener yielded, we'll track the task to monitor it for errors.
+	if coroutine.status(task.co) == "suspended" then
+		trackedTasks[task] = true
+		Runtime.__start()
 	end
 end
 

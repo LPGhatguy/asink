@@ -4,35 +4,9 @@ local Future = {}
 
 Future.__index = Future
 
-local function runListener(listener, value)
-	local completed = false
-	local co = coroutine.create(function(...)
-		listener(...)
-		completed = true
-	end)
-	local success, result = coroutine.resume(co, value)
-
-	if not success then
-		local message = ("%s\n%s"):format(tostring(result), debug.traceback(co))
-		Runtime.__fireFutureRejection(message)
-		return
-	end
-
-	if coroutine.status(co) == "suspended" then
-		Runtime.__addFutureAndStart(co)
-	end
-end
-
-local function exec(functor)
-	local bindable = Instance.new("BindableEvent")
-	bindable.Event:Connect(functor)
-	bindable:Fire()
-	bindable:Destroy()
-end
-
 local function addListener(future, listener)
 	if future.__resolved then
-		runListener(listener, future.__value)
+		Runtime.__runFutureListener(listener, future.__value)
 		return
 	end
 
@@ -48,7 +22,7 @@ local function resolveFuture(future, value)
 	future.__value = value
 
 	for _, listener in ipairs(future.__listeners) do
-		runListener(listener, value)
+		Runtime.__runFutureListener(listener, value)
 	end
 end
 

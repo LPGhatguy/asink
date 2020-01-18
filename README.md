@@ -53,6 +53,7 @@ Loosely modeled after Rust's [type of the same name](https://doc.rust-lang.org/s
 * `Future:andThen(f: T => Future<U>) => Future<U>`
 
 ### `Cancelable<T>`
+A value type that represents either a completed operation or that it was canceled.
 
 * `Cancelable.completed(value: T) => Cancelable`
 * `Cancelable.canceled() => Cancelable`
@@ -65,9 +66,10 @@ Loosely modeled after Rust's [type of the same name](https://doc.rust-lang.org/s
 * `Cancelable:andThen(f: T => Cancelable<U>) => Cancelable<U>`
 
 ### `Runtime`
-Currently non-functional.
+A small scheduler that monitors outstanding futures and signals user code if any of them throw.
 
 * `Runtime.addFutureRejectionHandler(fn)`
+* `Runtime.exec(fn)`
 
 ## Examples
 To build and run an example, use:
