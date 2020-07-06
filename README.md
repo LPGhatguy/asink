@@ -12,8 +12,9 @@ It says:
 
 * `Future` (our function is async)
 	* ...returning a `Result` (our function can fail)
-		* ...containing a `string` on success (like the body of an HTTP response)
-		* ...and containing a different `string` on failure (like an error message)
+		* ...containing a `Cancelable` (our function can be canceled)
+			* ...containing a `string` on success (like the body of an HTTP response)
+		* ...or containing a `string` on failure (like an error message)
 
 Asink forces consuming code to explicitly handle failure, which can be as simple as throwing an error. This is in contrast to yielding+exceptions and promises in that failure must be acknowledged.
 
